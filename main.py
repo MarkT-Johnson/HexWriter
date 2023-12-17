@@ -10,9 +10,12 @@ canvas_size = 1000
 canvas = Canvas(window, width=canvas_size, height=canvas_size, bg="white")
 canvas.pack()
 
-origin = [canvas_size/2, canvas_size/2]
-lines = [[1, 2, 3, 4], [1, 2, 3, 4]]
+origin1 = [250, 750]
+origin2 = [500, 500]
 
-new_hex = Hexagram(origin, lines, canvas_size, canvas)
+lines = [[1, 2, 3, 4], [1, 2, 3, 4]]    # Dummy time
+
+new_hex1 = Hexagram(origin1, lines, canvas_size, canvas)
+new_hex2 = Hexagram(origin2, lines, canvas_size)
 
 window.mainloop()

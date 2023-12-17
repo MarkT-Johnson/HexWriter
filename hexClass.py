@@ -1,5 +1,5 @@
 import tkinter as tk
-from math import cos, sin, pi, sqrt
+from math import cos, sin, pi
 
 
 class Hexagram:
@@ -7,6 +7,7 @@ class Hexagram:
 
     canvas_size = None
     canvas = None
+
     # Modifiers needed to draw the starters and secondary origin. All Hexes should share the same mods
     primary_starter_mod = [0.0, 0.0]
     secondary_origin_mod = [0.0, 0.0]
@@ -18,6 +19,8 @@ class Hexagram:
                       180,  # Tri 4
                       240,  # Tri 5
                       300]  # Tri 6
+
+    hexagram_count = 0
 
     def __init__(self, origin: Point, lines: list[list[int]], canvas_sz: int, canvas: tk.Canvas = None):
         """
@@ -31,6 +34,8 @@ class Hexagram:
         Hexagram.canvas_size = canvas_sz  # When creating a new hex, we may need to update the canvas size
         Hexagram.canvas = Hexagram.canvas if canvas is None else canvas  # If we already have a canvas, we dont need to instantiate a new one.
         Hexagram._update_mods(self)
+        Hexagram.hexagram_count += 1    # Track total number of shorts
+        self.hex_number = Hexagram.hexagram_count   # Track which Hex this object is
         self.draw_hex()
 
     def _update_mods(self):
