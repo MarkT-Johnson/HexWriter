@@ -9,7 +9,7 @@ class Hexagram:
     # Modifiers needed to draw each point around the hex. All Hexes should share the same mods
     point_mods = list[Point]
 
-    def __init__(self, origin: Point, lines: list[int], canvas_sz: int, canvas: tk.Canvas = None):
+    def __init__(self, origin: Point, lines: list[list[int]], canvas_sz: int, canvas: tk.Canvas = None):
         """
         Initializes a new hexagram around the origin point with several lines
         :param canvas: The canvas this hexagram is being drawn on
@@ -80,9 +80,10 @@ class Hexagram:
         :param degrees: How far we are rotating (default 60 degrees)
         :return: New Point coordinates [x', y']
         """
-        # Translate point so we can rotate about [0, 0]
+        # Translate point, so we can rotate about [0, 0]
         trans_point = self._sub_points(point, origin)
 
+        # Convert degrees to radians
         radians = degrees * pi / 180
 
         # Calculate rotated point about the origin

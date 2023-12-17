@@ -3,15 +3,15 @@ from math import sqrt, cos, sin, pi
 
 # How big the canvas should be
 canvas_size = 1000
-# l = Length of sides
+# l = Length of sides (10% of canvas size
 l = canvas_size / 10
-# h = height
+# h = height (simplified Herons formula and height formula)
 h = (sqrt(3) * l) / 2
 origin = [canvas_size / 2, canvas_size / 2]
 
 Point = list[float]
 
-sec_origin_mod = [l/9, -l/6]
+sec_origin_mod = [l / 9, -l / 6]
 
 # Modifiers needed to draw each point around the hex
 point_mods = [[0, -l],  # Point 1
@@ -20,6 +20,13 @@ point_mods = [[0, -l],  # Point 1
               [0, l],  # Point 4
               [-h, l / 2],  # Point 5
               [-h, -l / 2]]  # Point 6
+
+point_mod_rots = [0,  # Tri 1
+                  60,  # Tri 2
+                  120,  # Tri 3
+                  180,  # Tri 4
+                  240,  # Tri 5
+                  300]  # Tri 6
 
 
 def add_points(point1: Point, point2: Point) -> Point:
@@ -59,12 +66,13 @@ def create_dot(canvas: Canvas, point: Point, size: int = 3, color: str = "black"
     return canvas.create_oval(x1, y1, x2, y2, fill=color, outline=color)
 
 
-def rotate_point(point: Point, origin: Point = [0, 0], degrees: int = 60) -> Point:
+def rotate_point(point: Point, origin: Point, degrees: int) -> Point:
     """
-    Rotates a point around an abstract origin and returns the new Point location
+    Rotates a point around an abstract origin and returns the new Point location.
+    "Rotate POINT about ORIGIN by DEGREES"
     :param point: Point we are going to rotate [x, y]
-    :param origin: The origin we are rotating around (defaults [0,0]
-    :param degrees: How far we are rotating (default 60 degrees)
+    :param origin: The origin we are rotating around [j, k]
+    :param degrees: How far we are rotating (in degrees)
     :return: New Point coordinates [x', y']
     """
     # Translate point so we can rotate about [0, 0]
@@ -73,7 +81,8 @@ def rotate_point(point: Point, origin: Point = [0, 0], degrees: int = 60) -> Poi
     radians = degrees * pi / 180
 
     # Calculate rotated point about the origin
-    rot_point = [trans_point[0]*cos(radians) - trans_point[1]*sin(radians), trans_point[1]*cos(radians) + trans_point[0]*sin(radians)]
+    rot_point = [trans_point[0] * cos(radians) - trans_point[1] * sin(radians),
+                 trans_point[1] * cos(radians) + trans_point[0] * sin(radians)]
 
     # Undo the initial translation after rotation
     return add_points(rot_point, origin)
@@ -92,16 +101,51 @@ hex_points = list()
 for point in point_mods:
     modded_point = add_points(origin, point)
     hex_points = hex_points + modded_point
-    canvas.create_line(origin + modded_point, width=2, fill="orange")
-    create_dot(canvas, modded_point, color="orange")
+    # canvas.create_line(origin + modded_point, width=2, fill="orange")
+    # create_dot(canvas, modded_point, color="orange")
+#
+# sec_origin = add_points(origin, sec_origin_mod)
+# create_dot(canvas, sec_origin, color="blue")
+#
+# rot_origin = rotate_point(sec_origin, origin)
+# create_dot(canvas,rot_origin, color="red")
 
-sec_origin = add_points(origin, sec_origin_mod)
-create_dot(canvas, sec_origin, color="blue")
+primary_starter_mod = [0, -l]
+secondary_origin_mod = [l / 9, -l / 6]
+secondary_starter_mod = [l / 9, -5 * l / 6]
 
-rot_origin = rotate_point(sec_origin, origin)
-create_dot(canvas,rot_origin, color="red")
+primary_starter = add_points(origin, primary_starter_mod)
+secondary_origin = add_points(origin, sec_origin_mod)
+secondary_starter = add_points(origin, secondary_starter_mod)
+
+for rot in point_mod_rots:
+    # Create primary points
+    curr_primary = rotate_point(primary_starter, origin, rot)
+    next_primary = rotate_point(curr_primary, origin, 60)
+
+    # Create secondary points
+    curr_sec_origin = rotate_point(secondary_origin, origin, rot)
+    curr_sec_outer1 = rotate_point(secondary_starter, origin, rot)
+    curr_sec_outer2 = rotate_point(curr_sec_outer1, curr_sec_origin, 60)    # We rotate around curr_sec_origin since the
+                                                                            # 60 degrees here refers to angle
+                                                                            # (curr_sec_outer1, curr_sec_origin, curr_sec_outer2)
+
+    # TODO: Insert logic for deciding which lines to draw
+    # TEMP: Draw ALL THE LINES!
+    width = 3
+    canvas.create_line(origin + curr_primary, fill="orange", width=width)
+    canvas.create_line(curr_primary + next_primary, fill="green", width=width)
+    canvas.create_line(curr_sec_origin + curr_sec_outer1, fill="orange", width=width)
+    canvas.create_line(curr_sec_outer1 + curr_sec_outer2, fill="green", width=width)
+
+    # Draw the dots
+    # create_dot(canvas, curr_primary)
+    # # Skip next_primary since it will be drawn in the next iteration as curr_primary
+    # create_dot(canvas, curr_sec_origin)
+    # create_dot(canvas, curr_sec_outer1)
+    # create_dot(canvas, curr_sec_outer2)
 
 create_dot(canvas, origin)
-canvas.tag_lower(canvas.create_polygon(hex_points, outline="lime", fill="white", width=2))
+canvas.tag_lower(canvas.create_polygon(hex_points, outline="grey", fill="white", width=2))  # Draw outline hex
 
 window.mainloop()
