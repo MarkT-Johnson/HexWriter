@@ -24,13 +24,13 @@ class Hexagram:
         Initializes a new hexagram around the origin point with several lines
         :param canvas: The canvas this hexagram is being drawn on
         :param origin: Point where the hexagram is drawn around
-        :param lines: List of which lines should be drawn per triangle [1, 2, 3, 4]
+        :param lines: List of which lines should be drawn per triangle [[1, 2, 3, 4], [1, 2, 3, 4]]
         """
         self.origin = origin
         self.lines = lines
         Hexagram.canvas_size = canvas_sz  # When creating a new hex, we may need to update the canvas size
         Hexagram.canvas = Hexagram.canvas if canvas is None else canvas  # If we already have a canvas, we dont need to instantiate a new one.
-        Hexagram._update_mods()
+        Hexagram._update_mods(self)
         self.draw_hex()
 
     def _update_mods(self):
