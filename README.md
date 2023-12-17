@@ -8,10 +8,10 @@ to encode the sentence.
 # Work In Progress Features:
 1. Drawing Hexes (its the start of the project, of course its WIP)
 2. Character to hex encoder
-3. Export image
 
 # Possible Future Features (in no particular order):
 * Alphabet display
 * Structure rules display
   * requires finalization of structure rules
 * "How to decode" tutorial
+* Export image
