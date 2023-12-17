@@ -3,7 +3,7 @@ from math import cos, sin, pi
 
 
 class Hexagram:
-    Point = list[float]  # A two element list of integers representing a coordinate
+    Point = list[float]  # A two element list of floats representing a coordinate
 
     canvas_size = None
     canvas = None
