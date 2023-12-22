@@ -13,7 +13,7 @@ canvas.pack()
 origin1 = [250, 750]
 origin2 = [500, 500]
 
-lines = [[1, 2, 3, 4], [1, 2, 3, 4]]    # Dummy time
+lines = [[1, 2, 3, 4], [1, 2, 3, 4]]    # Dummy lines
 
 new_hex1 = Hexagram(origin1, lines, canvas_size, canvas)
 new_hex2 = Hexagram(origin2, lines, canvas_size)
