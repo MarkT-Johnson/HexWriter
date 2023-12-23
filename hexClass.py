@@ -13,6 +13,8 @@ class Hexagram:
     secondary_origin_mod = [0.0, 0.0]
     secondary_starter_mod = [0.0, 0.0]
 
+    origin = None
+
     point_mod_rots = [0,  # Tri 1
                       60,  # Tri 2
                       120,  # Tri 3
@@ -22,30 +24,62 @@ class Hexagram:
 
     hexagram_count = 0
 
-    def __init__(self, origin: Point, lines: list[list[int]], canvas_sz: int, canvas: tk.Canvas = None):
+    def __init__(self, lines: list[list[int]], canvas_sz: int = None, canvas: tk.Canvas = None):
         """
         Initializes a new hexagram around the origin point with several lines
-        :param canvas: The canvas this hexagram is being drawn on
-        :param origin: Point where the hexagram is drawn around
-        :param lines: List of which lines should be drawn per triangle [[1, 2, 3, 4], [1, 2, 3, 4]]
+        :param canvas_sz: The dimension of the canvas (first hex only)
+        :param canvas: The canvas the hexagrams are being drawn on (first hex only)
+        :param lines: List of which lines should be drawn per triangle [[1, 2, 3, 4], [1, 2, 3, 4], ...]
         """
-        self.origin = origin
-        self.lines = lines
-        Hexagram.canvas_size = canvas_sz  # When creating a new hex, we may need to update the canvas size
+        Hexagram.canvas_size = Hexagram.canvas_size if canvas_sz is None else canvas_sz  # If we already have a canvas_size, we dont need to instantiate a new one.
         Hexagram.canvas = Hexagram.canvas if canvas is None else canvas  # If we already have a canvas, we dont need to instantiate a new one.
         Hexagram._update_mods(self)
+        self.lines = lines
         Hexagram.hexagram_count += 1    # Track total number of shorts
         self.hex_number = Hexagram.hexagram_count   # Track which Hex this object is
         self.draw_hex()
 
     def _update_mods(self):
+        """
+        Updates the common modifiers used by all hexagrams when drawn (class origin, primary_starter_mod,
+        secondary_origin_mod, secondary_starter_mod), as well as updating the instance specific origin based
+        on which number of hex this instance of a hexagram is
+        :return: None
+        """
         # l = Length of primary sides
         l = Hexagram.canvas_size / 10
+
+        # Determine the class origin, from which the individual hexagrams will base their own origins around
+        Hexagram.origin = [Hexagram.canvas_size / 2, Hexagram.canvas_size / 2]
+
+        # Calculate the instance version of the origin based on hex_number
+        for i in range(self.hex_number):
+            #TODO: add math for determining new self.origin_mod
+            pass
 
         # Modifiers needed to draw the starters and secondary origin. All Hexes should share the same mods
         Hexagram.primary_starter_mod = [0, -l]
         Hexagram.secondary_origin_mod = [l / 9, -l / 6]
         Hexagram.secondary_starter_mod = [l / 9, -5 * l / 6]
+
+    def _bearing(self, start: Point, degrees: float, dist: float) -> Point:
+        """
+        Calculates a new point based off a intitial point given a bearing and distance.
+        x` = [ Sin(rad) * dist ] + x
+        y` = [ Cos(rad) * dist ] + y
+        :param start_p: Intitial point being measured from
+        :param degrees: The bearing we are going (in degrees)
+        :param dist: The distance we are going
+        :return: The coordinates of the new point
+        """
+        # Convert degrees to radians
+        radians = degrees * pi / 180
+
+        # Get new x` and y`
+        x_p = (sin(radians) * dist) + start[0]
+        y_p = (cos(radians) * dist) + start[1]
+
+        return [x_p, y_p]
 
     def _create_dot(self, point: Point, size: int = 3, color: str = "black"):
         """
@@ -106,18 +140,19 @@ class Hexagram:
         Draws the hexagram using the unique origin and lines as well as the shared canvas and point modifiers
         :return: None
         """
-        primary_starter = self._add_points(self.origin, Hexagram.primary_starter_mod)
-        secondary_origin = self._add_points(self.origin, Hexagram.secondary_origin_mod)
-        secondary_starter = self._add_points(self.origin, Hexagram.secondary_starter_mod)
+        primary_origin = self._add_points(Hexagram.origin, self.origin_mod)
+        primary_starter = self._add_points(primary_origin, Hexagram.primary_starter_mod)
+        secondary_origin = self._add_points(primary_origin, Hexagram.secondary_origin_mod)
+        secondary_starter = self._add_points(primary_origin, Hexagram.secondary_starter_mod)
 
         for rot in Hexagram.point_mod_rots:
             # Create primary points
-            curr_primary = self._rotate_point(primary_starter, self.origin, rot)
-            next_primary = self._rotate_point(curr_primary, self.origin, 60)
+            curr_primary = self._rotate_point(primary_starter, primary_origin, rot)
+            next_primary = self._rotate_point(curr_primary, primary_origin, 60)
 
             # Create secondary points
-            curr_sec_origin = self._rotate_point(secondary_origin, self.origin, rot)
-            curr_sec_outer1 = self._rotate_point(secondary_starter, self.origin, rot)
+            curr_sec_origin = self._rotate_point(secondary_origin, primary_origin, rot)
+            curr_sec_outer1 = self._rotate_point(secondary_starter, primary_origin, rot)
             curr_sec_outer2 = self._rotate_point(curr_sec_outer1, curr_sec_origin, 60)  # We rotate around curr_sec_origin since the
                                                                                         # 60 degrees here refers to angle
                                                                                         # (curr_sec_outer1, curr_sec_origin, curr_sec_outer2)
@@ -125,7 +160,7 @@ class Hexagram:
             # TODO: Insert logic for deciding which lines to draw
             # TEMP: Draw ALL THE LINES!
             width = 3
-            Hexagram.canvas.create_line(self.origin + curr_primary, fill="orange", width=width)
+            Hexagram.canvas.create_line(primary_origin + curr_primary, fill="orange", width=width)
             Hexagram.canvas.create_line(curr_primary + next_primary, fill="green", width=width)
             Hexagram.canvas.create_line(curr_sec_origin + curr_sec_outer1, fill="orange", width=width)
             Hexagram.canvas.create_line(curr_sec_outer1 + curr_sec_outer2, fill="green", width=width)

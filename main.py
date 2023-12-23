@@ -13,9 +13,10 @@ canvas.pack()
 origin1 = [250, 750]
 origin2 = [500, 500]
 
-lines = [[1, 2, 3, 4], [1, 2, 3, 4]]    # Dummy lines
+# lines = [[primary inner lines], [secondary inner lines],[primary outer lines], [secondary outer lines]]
+all_lines = [[1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6]]    # Dummy lines
 
-new_hex1 = Hexagram(origin1, lines, canvas_size, canvas)
-new_hex2 = Hexagram(origin2, lines, canvas_size)
+new_hex1 = Hexagram(all_lines, canvas_size, canvas)
+new_hex2 = Hexagram(all_lines, canvas_size)
 
 window.mainloop()
