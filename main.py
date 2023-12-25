@@ -1,5 +1,6 @@
 from hexClass import *
 from tkinter import *
+import re
 
 
 #TODO Temporary Comment out while I figure out the encoding
@@ -24,10 +25,10 @@ from tkinter import *
 # window.mainloop()
 
 
-def encoder(input: str) -> list[list[int]]:
+def encoder(text: str) -> list[list[int]]:
     """
     Takes the text input and encodes it into the line lists
-    :param input: The text input
+    :param text: The text input
     :return: The list of triangles and what lines to draw for them
     """
     #"": [[],[],[],[],[],[]]
@@ -87,7 +88,16 @@ def encoder(input: str) -> list[list[int]]:
                 "_R": [[],[1],[1],[],[1],[1]],
                 "_S": [[1],[1],[1],[],[1],[1]],
                 "_T": [[],[],[],[1],[1],[1]],
-                "_U": [[1],[],[],[1],[1],[1]]}
+                "_U": [[1],[],[],[1],[1],[1]],
+                "_V": [[],[1],[],[1],[1],[1]],
+                "_W": [[1],[1],[],[1],[1],[1]],
+                "_X": [[],[],[1],[1],[1],[1]],
+                "_Y": [[1],[],[1],[1],[1],[1]],
+                "_Z": [[],[1],[1],[1],[1],[1]]}
+
+    text = text.upper()
+    four_chunks = re.findall(".{1,4}", text)
+    print(four_chunks)
 
 text = input("Enter text to encode: ")
 
