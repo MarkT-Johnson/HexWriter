@@ -131,25 +131,22 @@ def encoder(text: str) -> list[list[str]]:
 
 text = input("Enter text to encode: ")
 
-print(encoder(text))
+encoded_text = encoder(text)
+print(encoded_text)
 
 # TODO Temporary Comment out while I figure out the encoding
-# window = Tk()
-#
-# window.title("HexWriter")
-# window.geometry("1000x1000")
-#
-# canvas_size = 1000
-# canvas = Canvas(window, width=canvas_size, height=canvas_size, bg="white")
-# canvas.pack()
-#
-# origin1 = [250, 750]
-# origin2 = [500, 500]
-#
-# # lines = "triangle 1 lines", "triangle 2 lines","triangle 3 lines", ...
-# all_lines = ["1111", "1111", "1111", "1111", "1111", "1111"]    # Dummy lines
-#
-# new_hex1 = Hexagram(all_lines, canvas_size, canvas)
-# new_hex2 = Hexagram(all_lines, canvas_size)
-#
-# window.mainloop()
+window = Tk()
+
+window.title("HexWriter")
+window.geometry("1000x1000")
+
+canvas_size = 1000
+canvas = Canvas(window, width=canvas_size, height=canvas_size, bg="white")
+canvas.pack()
+
+# lines = "triangle 1 lines", "triangle 2 lines","triangle 3 lines", ...
+all_lines = ["1111", "1111", "1111", "1111", "1111", "1111"]    # Dummy lines
+
+new_hex1 = Hexagram(encoded_text[0], canvas_size, canvas)
+
+window.mainloop()

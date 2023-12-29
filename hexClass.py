@@ -24,7 +24,7 @@ class Hexagram:
 
     hexagram_count = 0
 
-    def __init__(self, lines: list[list[int]], canvas_sz: int = None, canvas: tk.Canvas = None):
+    def __init__(self, lines: list[str], canvas_sz: int = None, canvas: tk.Canvas = None):
         """
         Initializes a new hexagram around the origin point with several lines
         :param canvas_sz: The dimension of the canvas (first hex only)
@@ -53,9 +53,11 @@ class Hexagram:
         Hexagram.origin = [Hexagram.canvas_size / 2, Hexagram.canvas_size / 2]
 
         # Calculate the instance version of the origin based on hex_number
-        for i in range(self.hex_number):
-            #TODO: add math for determining new self.origin_mod
-            pass
+        # for i in range(self.hex_number):
+        #     #TODO: add math for determining new self.origin_mod
+        #     pass
+
+        self.origin_mod = [0.0, 0.0]
 
         # Modifiers needed to draw the starters and secondary origin. All Hexes should share the same mods
         Hexagram.primary_starter_mod = [0, -l]
@@ -145,7 +147,9 @@ class Hexagram:
         secondary_origin = self._add_points(primary_origin, Hexagram.secondary_origin_mod)
         secondary_starter = self._add_points(primary_origin, Hexagram.secondary_starter_mod)
 
-        for rot in Hexagram.point_mod_rots:
+        for tri in range(0, 6):
+            rot = Hexagram.point_mod_rots[tri]
+
             # Create primary points
             curr_primary = self._rotate_point(primary_starter, primary_origin, rot)
             next_primary = self._rotate_point(curr_primary, primary_origin, 60)
@@ -157,10 +161,13 @@ class Hexagram:
                                                                                         # 60 degrees here refers to angle
                                                                                         # (curr_sec_outer1, curr_sec_origin, curr_sec_outer2)
 
-            # TODO: Insert logic for deciding which lines to draw
-            # TEMP: Draw ALL THE LINES!
             width = 3
-            Hexagram.canvas.create_line(primary_origin + curr_primary, fill="orange", width=width)
-            Hexagram.canvas.create_line(curr_primary + next_primary, fill="green", width=width)
-            Hexagram.canvas.create_line(curr_sec_origin + curr_sec_outer1, fill="orange", width=width)
-            Hexagram.canvas.create_line(curr_sec_outer1 + curr_sec_outer2, fill="green", width=width)
+            # For each line in the current triangle, determine if it should be drawn
+            if self.lines[tri][0] == "1":   # Draw line 1
+                Hexagram.canvas.create_line(primary_origin + curr_primary, fill="orange", width=width)
+            if self.lines[tri][1] == "1":   # Draw line 2
+                Hexagram.canvas.create_line(curr_sec_origin + curr_sec_outer1, fill="orange", width=width)
+            if self.lines[tri][2] == "1":   # Draw line 3
+                Hexagram.canvas.create_line(curr_primary + next_primary, fill="green", width=width)
+            if self.lines[tri][3] == "1":   # Draw line 4
+                Hexagram.canvas.create_line(curr_sec_outer1 + curr_sec_outer2, fill="green", width=width)
