@@ -95,9 +95,40 @@ def encoder(text: str) -> list[int]:
                 "_Y": [1, 0, 1, 1, 1, 1],
                 "_Z": [0, 1, 1, 1, 1, 1]}
 
+    # Convert the text to all upper case. We need to split it into chunks of 4 while replacing spaces with an indicator
+    # that a space needs to be placed here instead. chunk_count is used to keep track if we need to start a new chunk
     text = text.upper()
-    four_chunks = re.findall(".{1,4}", text)
+    four_chunks = []
+    new_chunk = ""
+    chunk_count = 0
+    for character in text:
+        if character == " ":
+            # If it's a space, subtract one from chunk_count
+            chunk_count -= 1
+        new_chunk += character
+        chunk_count += 1
+
+        if chunk_count == 4:
+            # We have a full chunk, add it to the four_chunk list and reset chunk_count
+            four_chunks.append(new_chunk)
+            new_chunk = ""
+            chunk_count = 0
+
+    # If we have finished processing all characters in the text we need to ensure we capture any stragglers that might
+    # not have completed a full chunk
+    if new_chunk != "":
+        four_chunks.append(new_chunk)
+
+    # At this point we should have chunks of four characters each (except the last one)
     print(four_chunks)
+
+    # Left letter tracks whether our next letter should be a left or right
+    left_letter = True
+    # hexes holds the encoded hexes as we build it
+    hexes = list[list[int]]
+    for chunk in four_chunks:
+        for character in chunk:
+            pass
 
 
 text = input("Enter text to encode: ")

@@ -9,9 +9,13 @@ to encode the sentence.
 1. Drawing Hexes (its the start of the project, of course its WIP)
 2. Character to hex encoder
 
+# Known Bugs:
+* The encoding process does not know how to handle special characters (.,!#$ etc). This is something that will be addressed in the future. For now it fails gracefully and should reprompt for text.
+
 # Possible Future Features (in no particular order):
 * Alphabet display
 * Structure rules display
   * requires finalization of structure rules
-* "How to decode" tutorial
+* "How to encode/decode" tutorial
 * Export image
+* Handle special characters in encoding (see known bugs)
