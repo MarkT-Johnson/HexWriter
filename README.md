@@ -5,19 +5,20 @@ Hexagrams (in the context of this project) are an encoding of the english langua
 numbers, and spaces. The full structure rules are still being worked on for how to represent full sentences that require more than one hexagram
 to encode the sentence.
 
-# Features:
+## Features:
 * Drawing Hexes (only one hex)
 * Text to hex encoder (not displayed in window)
 
-# Work In Progress Features:
+## Work In Progress Features:
 1. Dynamic origin determination
    * Current limitation on the one hex only requirement
+   * Need to figure out how to determine the new angle for the bearing method to use
 2. Draw more than one hex (requires Dynamic Origin Determination)
 
-# Known Bugs:
+## Known Bugs:
 * The encoding process does not know how to handle special characters (.,!#$ etc). This is something that will be addressed in the future.
 
-# Possible Future Features (in no particular order):
+## Possible Future Features (in no particular order):
 * Alphabet display
 * Structure rules display
   * requires finalization of structure rules

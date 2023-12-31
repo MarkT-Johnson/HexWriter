@@ -1,5 +1,6 @@
+import math
 import tkinter as tk
-from math import cos, sin, pi
+from math import cos, sin, pi, sqrt, ceil
 
 
 class Hexagram:
@@ -48,16 +49,29 @@ class Hexagram:
         """
         # l = Length of primary sides
         l = Hexagram.canvas_size / 10
+        # h = height of a triangle
+        h = (sqrt(3)*l)/2
 
         # Determine the class origin, from which the individual hexagrams will base their own origins around
         Hexagram.origin = [Hexagram.canvas_size / 2, Hexagram.canvas_size / 2]
 
-        # Calculate the instance version of the origin based on hex_number
-        # for i in range(self.hex_number):
-        #     #TODO: add math for determining new self.origin_mod
-        #     pass
+        # Distance that each origin is offset from the other
+        origin_offset = (l * 2) + (l / 9)
 
-        self.origin_mod = [0.0, 0.0]
+        # TODO: Figure out how to determine the correct angle for the bearing
+        # Calculate the instance version of the origin based on hex_number
+        new_origin = [0.0, 0.0]
+        heading = 0
+        for hex in range(self.hex_number - 1):
+            layer = ceil(hex / 6)
+            hexes_in_layers = sum(max((x * 6), 1) for x in range(layer, -1, -1))
+            if hex == hexes_in_layers:
+                # If our current hex is the last one in the layer, we need to continue on current heading
+                pass
+
+            new_origin = self._bearing(new_origin, heading, origin_offset)
+
+        self.origin_mod = new_origin
 
         # Modifiers needed to draw the starters and secondary origin. All Hexes should share the same mods
         Hexagram.primary_starter_mod = [0, -l]

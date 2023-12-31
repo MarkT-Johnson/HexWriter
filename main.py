@@ -134,7 +134,6 @@ text = input("Enter text to encode: ")
 encoded_text = encoder(text)
 print(encoded_text)
 
-# TODO Temporary Comment out while I figure out the encoding
 window = Tk()
 
 window.title("HexWriter")
