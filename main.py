@@ -1,6 +1,8 @@
 from hexClass import *
 from tkinter import *
 
+class EncodingError(Exception):
+    pass
 
 def encoder(text: str) -> list[list[str]]:
     """
@@ -70,7 +72,8 @@ def encoder(text: str) -> list[list[str]]:
                 "_W": ["1", "1", "0", "1", "1", "1"],
                 "_X": ["0", "0", "1", "1", "1", "1"],
                 "_Y": ["1", "0", "1", "1", "1", "1"],
-                "_Z": ["0", "1", "1", "1", "1", "1"]}
+                "_Z": ["0", "1", "1", "1", "1", "1"],
+                ".": [".", ".", ".", ".", ".", "."]}
 
     # Convert the text to all upper case. We need to split it into chunks of 4 while replacing spaces with an indicator
     # that a space needs to be placed here instead. chunk_count is used to keep track if we need to start a new chunk
@@ -108,20 +111,24 @@ def encoder(text: str) -> list[list[str]]:
                 # processing this character
                 left_letter = not left_letter
                 continue
-            elif character in "123456890":
-                # If the character is a number then we dont need to add a left right indicator
+            elif character in "123456890.":
+                # If the character is a number or period then we dont need to add a left right indicator or alternate
+                # the tracker
                 letter = character
-            else:
+            elif character.isalpha():
                 # Determine where left right indicator is needed based on left_letter tracker
                 letter = character + "_" if left_letter else "_" + character
+                # Alternate the left_letter tracker
+                left_letter = not left_letter
+            else:
+                # This must be a special character and is not encoded, stop processing and fail gracefully
+                position = text.find(character)
+                raise EncodingError(f"Unknown character encountered: {character} at position {str(position)} in input")
 
             # Get the encoding for each letter, then append the encoding to the new_hex
             encoding = alphabet.get(letter)
             for triangle in range(0,6):
                 new_hex[triangle] = new_hex[triangle] + encoding[triangle]
-
-            # Alternate the left_letter tracker
-            left_letter = not left_letter
 
         # add the new hex to the existing ones
         hexes.append(new_hex)
@@ -130,8 +137,12 @@ def encoder(text: str) -> list[list[str]]:
 
 
 text = input("Enter text to encode: ")
+try:
+    encoded_text = encoder(text)
+except EncodingError as e:
+    print(e)
+    exit()
 
-encoded_text = encoder(text)
 print(encoded_text)
 
 window = Tk()

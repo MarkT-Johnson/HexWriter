@@ -16,7 +16,7 @@ to encode the sentence.
 2. Draw more than one hex (requires Dynamic Origin Determination)
 
 ## Known Bugs:
-* The encoding process does not know how to handle special characters (.,!#$ etc). This is something that will be addressed in the future.
+* None known so far
 
 ## Possible Future Features (in no particular order):
 * Alphabet display

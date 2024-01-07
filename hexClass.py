@@ -58,6 +58,8 @@ class Hexagram:
         # Distance that each origin is offset from the other
         origin_offset = (l * 2) + (l / 9)
 
+        # self.origin_mod = [0.0, 0.0]
+
         # TODO: Figure out how to determine the correct angle for the bearing
         # Calculate the instance version of the origin based on hex_number
         new_origin = [0.0, 0.0]
@@ -174,7 +176,6 @@ class Hexagram:
             curr_sec_outer2 = self._rotate_point(curr_sec_outer1, curr_sec_origin, 60)  # We rotate around curr_sec_origin since the
                                                                                         # 60 degrees here refers to angle
                                                                                         # (curr_sec_outer1, curr_sec_origin, curr_sec_outer2)
-
             width = 3
             # For each line in the current triangle, determine if it should be drawn
             if self.lines[tri][0] == "1":   # Draw line 1
