@@ -1,10 +1,11 @@
 from hexClass import *
 from tkinter import *
+import functools
 
 class EncodingError(Exception):
     pass
 
-def encoder(text: str) -> list[list[str]]:
+def encoder(text: str, canvas: Canvas, size: int) -> list[list[str]]:
     """
     Takes the text input and encodes it into the line lists
     :param text: The text input
@@ -75,6 +76,9 @@ def encoder(text: str) -> list[list[str]]:
                 "_Z": ["0", "1", "1", "1", "1", "1"],
                 ".": [".", ".", ".", ".", ".", "."]}
 
+    # Clear the Canvas of previous hexagrams
+    canvas.delete("all")
+
     # Convert the text to all upper case. We need to split it into chunks of 4 while replacing spaces with an indicator
     # that a space needs to be placed here instead. chunk_count is used to keep track if we need to start a new chunk
     text = text.upper()
@@ -133,30 +137,50 @@ def encoder(text: str) -> list[list[str]]:
         # add the new hex to the existing ones
         hexes.append(new_hex)
 
-    return hexes
+    for hex in hexes:
+        Hexagram(hex, canvas_sz=size, canvas=canvas)
 
 
-text = input("Enter text to encode: ")
-try:
-    encoded_text = encoder(text)
-except EncodingError as e:
-    print(e)
-    exit()
+################ Start of script ################
+# text = input("Enter text to encode: ")
+# try:
+#     encoded_text = encoder(text)
+# except EncodingError as e:
+#     print(e)
+#     exit()
+#
+# print(encoded_text)
 
-print(encoded_text)
-
+# Create the parent frame
 window = Tk()
 
 window.title("HexWriter")
-window.geometry("1000x1000")
+window.geometry("1000x1050")
+window.resizable(False, False)
+
+# Create an encoding frame
+encoder_frame = Frame(window)
+encoder_frame.pack(padx=10, pady=10, fill='x', expand=True)
+
+# Create a text box for user to enter text
+entry_text = StringVar()
+
+entry_label = Label(encoder_frame, text="Enter text to encode:")
+entry_label.pack(fill='x', expand=True)
 
 canvas_size = 1000
 canvas = Canvas(window, width=canvas_size, height=canvas_size, bg="white")
+
+entry_box = Entry(encoder_frame, textvariable=entry_text)
+entry_box.bind('<Return>', functools.partial(encoder, text=entry_text.get(), canvas=canvas, size=canvas_size))
+entry_box.pack(fill='x', expand=True)
+entry_box.focus_set()
+
 canvas.pack()
 
 # lines = "triangle 1 lines", "triangle 2 lines","triangle 3 lines", ...
-all_lines = ["1111", "1111", "1111", "1111", "1111", "1111"]    # Dummy lines
-
-new_hex1 = Hexagram(encoded_text[0], canvas_size, canvas)
+# all_lines = ["1111", "1111", "1111", "1111", "1111", "1111"]    # Dummy lines
+# encoded_text = [all_lines,]
+# new_hex1 = Hexagram(encoded_text[0], canvas_size, canvas)
 
 window.mainloop()
