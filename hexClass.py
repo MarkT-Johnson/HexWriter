@@ -34,10 +34,10 @@ class Hexagram:
         """
         Hexagram.canvas_size = Hexagram.canvas_size if canvas_sz is None else canvas_sz  # If we already have a canvas_size, we dont need to instantiate a new one.
         Hexagram.canvas = Hexagram.canvas if canvas is None else canvas  # If we already have a canvas, we dont need to instantiate a new one.
-        Hexagram._update_mods(self)
         self.lines = lines
         Hexagram.hexagram_count += 1    # Track total number of shorts
-        self.hex_number = Hexagram.hexagram_count   # Track which Hex this object is
+        self.hex_number = Hexagram.hexagram_count   # Track which Hex this object is starting at one
+        Hexagram._update_mods(self)
         self.draw_hex()
 
     def _update_mods(self):
@@ -56,24 +56,21 @@ class Hexagram:
         Hexagram.origin = [Hexagram.canvas_size / 2, Hexagram.canvas_size / 2]
 
         # Distance that each origin is offset from the other
-        origin_offset = (l * 2) + (l / 9)
+        origin_offset = (l * 2) - (l / 9)
 
-        self.origin_mod = [0.0, 0.0]
+        # self.origin_mod = [0.0, 0.0]
 
         # TODO: Figure out how to determine the correct angle for the bearing
         # Calculate the instance version of the origin based on hex_number
-        # new_origin = [0.0, 0.0]
-        # heading = 0
-        # for hex in range(self.hex_number - 1):
-        #     layer = ceil(hex / 6)
-        #     hexes_in_layers = sum(max((x * 6), 1) for x in range(layer, -1, -1))
-        #     if hex == hexes_in_layers:
-        #         # If our current hex is the last one in the layer, we need to continue on current heading
-        #         pass
-        #
-        #     new_origin = self._bearing(new_origin, heading, origin_offset)
-        #
-        # self.origin_mod = new_origin
+        new_origin = [0.0, 0.0]
+
+        # This mechanism should work for hexes 1-7 but after that it falls apart
+        if self.hex_number > 1:
+            heading = 30
+            heading += (self.hex_number - 2) * 60
+            new_origin = self._rotate_point([0.0, -origin_offset], [0.0, 0.0], heading)
+
+        self.origin_mod = new_origin
 
         # Modifiers needed to draw the starters and secondary origin. All Hexes should share the same mods
         Hexagram.primary_starter_mod = [0, -l]

@@ -5,7 +5,7 @@ import functools
 class EncodingError(Exception):
     pass
 
-def encoder(text: str, canvas: Canvas, size: int) -> list[list[str]]:
+def encoder(text: str) -> list[list[str]]:
     """
     Takes the text input and encodes it into the line lists
     :param text: The text input
@@ -74,10 +74,7 @@ def encoder(text: str, canvas: Canvas, size: int) -> list[list[str]]:
                 "_X": ["0", "0", "1", "1", "1", "1"],
                 "_Y": ["1", "0", "1", "1", "1", "1"],
                 "_Z": ["0", "1", "1", "1", "1", "1"],
-                ".": [".", ".", ".", ".", ".", "."]}
-
-    # Clear the Canvas of previous hexagrams
-    canvas.delete("all")
+                ".": ["0", "0", "0", "0", "0", "0"]}
 
     # Convert the text to all upper case. We need to split it into chunks of 4 while replacing spaces with an indicator
     # that a space needs to be placed here instead. chunk_count is used to keep track if we need to start a new chunk
@@ -93,7 +90,7 @@ def encoder(text: str, canvas: Canvas, size: int) -> list[list[str]]:
         chunk_count += 1
 
         if chunk_count == 4:
-            # We have a full chunk, add it to the four_chunk list and reset chunk_count
+            # We have a full chunk, add it to the four_chunk list and reset chunk_count and new_chunk
             four_chunks.append(new_chunk)
             new_chunk = ""
             chunk_count = 0
@@ -101,6 +98,10 @@ def encoder(text: str, canvas: Canvas, size: int) -> list[list[str]]:
     # If we have finished processing all characters in the text we need to ensure we capture any stragglers that might
     # not have completed a full chunk
     if new_chunk != "":
+        # If last chunk is not a perfect set of 4 append a period to pad it
+        while chunk_count < 4:
+            new_chunk = new_chunk + "."
+            chunk_count += 1
         four_chunks.append(new_chunk)
 
     # Left letter tracks whether our next letter should be a left or right
@@ -116,8 +117,8 @@ def encoder(text: str, canvas: Canvas, size: int) -> list[list[str]]:
                 left_letter = not left_letter
                 continue
             elif character in "123456890.":
-                # If the character is a number or period then we dont need to add a left right indicator or alternate
-                # the tracker
+                # If the character is a number or period then we dont need to add a left right indicator or
+                # alternate the tracker
                 letter = character
             elif character.isalpha():
                 # Determine where left right indicator is needed based on left_letter tracker
@@ -137,8 +138,7 @@ def encoder(text: str, canvas: Canvas, size: int) -> list[list[str]]:
         # add the new hex to the existing ones
         hexes.append(new_hex)
 
-    for hex in hexes:
-        Hexagram(hex, canvas_sz=size, canvas=canvas)
+    return hexes
 
 
 ################ Start of script ################
@@ -181,6 +181,10 @@ canvas.pack()
 lines = "triangle 1 lines", "triangle 2 lines","triangle 3 lines", ...
 all_lines = ["1111", "1111", "1111", "1111", "1111", "1111"]    # Dummy lines
 # encoded_text = [all_lines,]
-new_hex1 = Hexagram(encoded_text[0], canvas_size, canvas)
 
-window.mainloop()
+if len(encoded_text) <= 7:
+    for hex in encoded_text:
+        Hexagram(hex, canvas_size, canvas)
+    window.mainloop()
+else:
+    print("Message too long. Limited to 28 letters, numbers, and periods total")
