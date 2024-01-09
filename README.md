@@ -6,14 +6,13 @@ numbers, and spaces. The full structure rules are still being worked on for how 
 to encode the sentence.
 
 ## Features:
-* Drawing Hexes (only one hex)
+* Drawing Hexes (1-7 hexes)
 * Text to hex encoder (not displayed in window)
 
 ## Work In Progress Features:
-1. Dynamic origin determination
-   * Current limitation on the one hex only requirement
-   * Need to figure out how to determine the new angle for the bearing method to use
-2. Draw more than one hex (requires Dynamic Origin Determination)
+1. Dynamic origin determination (7+ hexes)
+   * Need programatic way to determine location of hexes outside of layers 1-2
+2. Draw more than 7 hex (requires Dynamic Origin Determination (7+ hexes))
 
 ## Known Bugs:
 * None known so far
@@ -24,5 +23,5 @@ to encode the sentence.
   * requires finalization of structure rules
 * "How to encode/decode" tutorial
 * Export image
-* Handle special characters in encoding (see known bugs)
 * Show text encoding in window
+* GUI input for text
