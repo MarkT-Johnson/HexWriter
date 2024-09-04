@@ -7,7 +7,9 @@ to encode the sentence.
 
 ## License:
 HexWriter by "Drakken_Dude" / Mark Johnson | GitHub: https://github.com/MarkT-Johnson/HexWriter
+
 Distributed under Creative Commons CC BY-NC-SA 4.0 License
+
 https://creativecommons.org/licenses/by-nc-sa/4.0/
 
 Feel free to adapt/build on this as you wish!
@@ -24,7 +26,7 @@ Feel free to adapt/build on this as you wish!
 2. Draw more than 7 hex (requires Dynamic Origin Determination (7+ hexes))
 
 ## Known Bugs:
-* None known so far
+* None known at this time
 
 ## Possible Future Features (in no particular order):
 * Alphabet display
