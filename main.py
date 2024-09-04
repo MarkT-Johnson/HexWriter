@@ -1,6 +1,5 @@
 from hexClass import *
 from tkinter import *
-import functools
 
 class EncodingError(Exception):
     pass
@@ -116,7 +115,7 @@ def encoder(text: str) -> list[list[str]]:
                 # processing this character
                 left_letter = not left_letter
                 continue
-            elif character in "123456890.":
+            elif character in "1234567890.":
                 # If the character is a number or period then we dont need to add a left right indicator or
                 # alternate the tracker
                 letter = character
@@ -140,17 +139,43 @@ def encoder(text: str) -> list[list[str]]:
 
     return hexes
 
+# Function to handle the Enter key press when user is finished typing
+def on_enter_key(event):
+    # Used because the binding of entry to the return key requires a function that can take in an event.
+    # But since we don't need the event really, we can simply point it to a function that discards it on calling the
+    # draw_hexagram function.
+    draw_hexagram()
+def draw_hexagram():
+    try:
+        # Clear the canvas before updating
+        canvas.delete("all")
+        # Get the text from the entry widget
+        text = entry.get()
+
+        # Encode the new text
+        encoded_text = encoder(text)
+        # Draw the hexagram on the canvas
+        hex_num = 1
+        if len(encoded_text) <= 7:
+            for hex in encoded_text:
+                Hexagram(hex, hex_num, canvas_size, canvas)
+                hex_num += 1
+            message = str(encoded_text)
+        else:
+            length_err = "Message too long. Limited to 28 letters, numbers, and periods total. Spaces are not counted in this total."
+            print(length_err)
+            message = length_err
+
+    except EncodingError as e:
+        message = "There was an encoding error, please only use english letters ([a-Z]), numbers ([0-9]), periods (.), or spaces ( )."
+
+    finally:
+        text_output['state'] = "normal"
+        text_output.delete("1.0", tk.END)
+        text_output.insert(tk.END, message)
+        text_output['state'] = "disabled"
 
 ################ Start of script ################
-text = input("Enter text to encode: ")
-try:
-    encoded_text = encoder(text)
-except EncodingError as e:
-    print(e)
-    exit()
-
-print(encoded_text)
-
 # Create the parent frame
 window = Tk()
 
@@ -163,28 +188,27 @@ window.resizable(False, False)
 # encoder_frame.pack(padx=10, pady=10, fill='x', expand=True)
 
 # Create a text box for user to enter text
-# entry_text = StringVar()
-#
-# entry_label = Label(encoder_frame, text="Enter text to encode:")
-# entry_label.pack(fill='x', expand=True)
+entry = tk.Entry(window, width=50)
+entry.bind("<Return>", on_enter_key)
+entry.pack(pady=10)
 
+# Create a button to update the canvas
+button = tk.Button(window, text="Draw Hexagram", command=draw_hexagram)
+button.pack(pady=10)
+
+# Create a text box for communicating to the user.
+text_output = tk.Text(window, width=300, height=3)
+text_output.insert(tk.END, "Your message will also appear as a numerical encoded message here that you can save for "
+                           "drawing again or decoding in the future.")
+text_output.pack(pady=10)
+text_output['state'] = "disabled"
+
+
+
+# Create a canvas for drawing on
 canvas_size = 1000
 canvas = Canvas(window, width=canvas_size, height=canvas_size, bg="white")
 
-# entry_box = Entry(encoder_frame, textvariable=entry_text)
-# entry_box.bind('<Return>', functools.partial(encoder, text=entry_text.get(), canvas=canvas, size=canvas_size))
-# entry_box.pack(fill='x', expand=True)
-# entry_box.focus_set()
-
 canvas.pack()
 
-lines = "triangle 1 lines", "triangle 2 lines","triangle 3 lines", ...
-all_lines = ["1111", "1111", "1111", "1111", "1111", "1111"]    # Dummy lines
-# encoded_text = [all_lines,]
-
-if len(encoded_text) <= 7:
-    for hex in encoded_text:
-        Hexagram(hex, canvas_size, canvas)
-    window.mainloop()
-else:
-    print("Message too long. Limited to 28 letters, numbers, and periods total")
+window.mainloop()

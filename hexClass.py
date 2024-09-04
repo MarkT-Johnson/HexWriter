@@ -25,7 +25,7 @@ class Hexagram:
 
     hexagram_count = 0
 
-    def __init__(self, lines: list[str], canvas_sz: int = None, canvas: tk.Canvas = None):
+    def __init__(self, lines: list[str], hex_number: int, canvas_sz: int = None, canvas: tk.Canvas = None):
         """
         Initializes a new hexagram around the origin point with several lines
         :param canvas_sz: The dimension of the canvas (first hex only)
@@ -35,8 +35,7 @@ class Hexagram:
         Hexagram.canvas_size = Hexagram.canvas_size if canvas_sz is None else canvas_sz  # If we already have a canvas_size, we dont need to instantiate a new one.
         Hexagram.canvas = Hexagram.canvas if canvas is None else canvas  # If we already have a canvas, we dont need to instantiate a new one.
         self.lines = lines
-        Hexagram.hexagram_count += 1    # Track total number of shorts
-        self.hex_number = Hexagram.hexagram_count   # Track which Hex this object is starting at one
+        self.hex_number = hex_number   # Track which Hex this object is starting at one
         Hexagram._update_mods(self)
         self.draw_hex()
 
