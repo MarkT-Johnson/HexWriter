@@ -1,6 +1,13 @@
-import math
 import tkinter as tk
-from math import cos, sin, pi, sqrt, ceil
+from math import cos, sin, pi
+
+"""
+HexWriter by "Drakken_Dude" / Mark Johnson | GitHub: 
+Distributed under Creative Commons CC BY-NC-SA 4.0 License
+https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+Feel free to adapt/build on this as you wish!
+"""
 
 
 class Hexagram:
@@ -32,10 +39,12 @@ class Hexagram:
         :param canvas: The canvas the hexagrams are being drawn on (first hex only)
         :param lines: List of which lines should be drawn per triangle [[1, 2, 3, 4], [1, 2, 3, 4], ...]
         """
-        Hexagram.canvas_size = Hexagram.canvas_size if canvas_sz is None else canvas_sz  # If we already have a canvas_size, we dont need to instantiate a new one.
-        Hexagram.canvas = Hexagram.canvas if canvas is None else canvas  # If we already have a canvas, we dont need to instantiate a new one.
+        # If we already have a canvas_size or canvas, we don't need to instantiate a new one.
+        Hexagram.canvas_size = Hexagram.canvas_size if canvas_sz is None else canvas_sz
+        Hexagram.canvas = Hexagram.canvas if canvas is None else canvas
+
         self.lines = lines
-        self.hex_number = hex_number   # Track which Hex this object is starting at one
+        self.hex_number = hex_number  # Track which Hex this object is starting at one
         Hexagram._update_mods(self)
         self.draw_hex()
 
@@ -46,16 +55,14 @@ class Hexagram:
         on which number of hex this instance of a hexagram is
         :return: None
         """
-        # l = Length of primary sides
-        l = Hexagram.canvas_size / 10
-        # h = height of a triangle
-        h = (sqrt(3)*l)/2
+        # length = Length of primary sides
+        length = Hexagram.canvas_size / 10
 
         # Determine the class origin, from which the individual hexagrams will base their own origins around
         Hexagram.origin = [Hexagram.canvas_size / 2, Hexagram.canvas_size / 2]
 
         # Distance that each origin is offset from the other
-        origin_offset = (l * 2) - (l / 9)
+        origin_offset = (length * 2) - (length / 9)
 
         # self.origin_mod = [0.0, 0.0]
 
@@ -72,16 +79,16 @@ class Hexagram:
         self.origin_mod = new_origin
 
         # Modifiers needed to draw the starters and secondary origin. All Hexes should share the same mods
-        Hexagram.primary_starter_mod = [0, -l]
-        Hexagram.secondary_origin_mod = [l / 9, -l / 6]
-        Hexagram.secondary_starter_mod = [l / 9, -5 * l / 6]
+        Hexagram.primary_starter_mod = [0, -length]
+        Hexagram.secondary_origin_mod = [length / 9, -length / 6]
+        Hexagram.secondary_starter_mod = [length / 9, -5 * length / 6]
 
-    def _bearing(self, start: Point, degrees: float, dist: float) -> Point:
+    @staticmethod
+    def _bearing(start: Point, degrees: float, dist: float) -> Point:
         """
-        Calculates a new point based off a intitial point given a bearing and distance.
+        Calculates a new point based off an initial point given a bearing and distance.
         x` = [ Sin(rad) * dist ] + x
         y` = [ Cos(rad) * dist ] + y
-        :param start_p: Intitial point being measured from
         :param degrees: The bearing we are going (in degrees)
         :param dist: The distance we are going
         :return: The coordinates of the new point
@@ -95,7 +102,8 @@ class Hexagram:
 
         return [x_p, y_p]
 
-    def _create_dot(self, point: Point, size: int = 3, color: str = "black"):
+    @staticmethod
+    def _create_dot(point: Point, size: int = 3, color: str = "black"):
         """
         Draws a dot around the point supplied, defaults to a black dot
         :param point: The point around which the dot should be drawn
@@ -107,7 +115,8 @@ class Hexagram:
         x2, y2 = (point[0] + size), (point[1] + size)
         return Hexagram.canvas.create_oval(x1, y1, x2, y2, fill=color, outline=color)
 
-    def _add_points(self, point1: Point, point2: Point) -> Point:
+    @staticmethod
+    def _add_points(point1: Point, point2: Point) -> Point:
         """
         Takes in two point arrays and returns the addition of the two together.
         Ex. [1, 1] + [2, 2] = [3, 3]
@@ -118,7 +127,8 @@ class Hexagram:
         # return [round(array1[0] + array2[0]), round(array1[1] + array2[1])]
         return [point1[0] + point2[0], point1[1] + point2[1]]
 
-    def _sub_points(self, point1: Point, point2: Point) -> Point:
+    @staticmethod
+    def _sub_points(point1: Point, point2: Point) -> Point:
         """
         Takes in two point arrays and returns the difference of the two together.
         Ex. sub_points([1, 1], [2, 2]) -> [1, 1] - [2, 2] = [-1, -1]
@@ -128,7 +138,7 @@ class Hexagram:
         """
         return [point1[0] - point2[0], point1[1] - point2[1]]
 
-    def _rotate_point(self, point: Point, origin: Point = [0, 0], degrees: int = 60) -> Point:
+    def _rotate_point(self, point: Point, origin: Point = None, degrees: int = 60) -> Point:
         """
         Rotates a point around an abstract origin and returns the new Point location
         :param point: Point we are going to rotate [x, y]
@@ -136,6 +146,11 @@ class Hexagram:
         :param degrees: How far we are rotating (default 60 degrees)
         :return: New Point coordinates [x', y']
         """
+
+        # Prevents a mutable default argument
+        if origin is None:
+            origin = [0, 0]
+
         # Translate point, so we can rotate about [0, 0]
         trans_point = self._sub_points(point, origin)
 
@@ -169,16 +184,17 @@ class Hexagram:
             # Create secondary points
             curr_sec_origin = self._rotate_point(secondary_origin, primary_origin, rot)
             curr_sec_outer1 = self._rotate_point(secondary_starter, primary_origin, rot)
-            curr_sec_outer2 = self._rotate_point(curr_sec_outer1, curr_sec_origin, 60)  # We rotate around curr_sec_origin since the
-                                                                                        # 60 degrees here refers to angle
-                                                                                        # (curr_sec_outer1, curr_sec_origin, curr_sec_outer2)
+
+            # We rotate around curr_sec_origin since the 60 degrees here refers to the following angle
+            # (curr_sec_outer1, curr_sec_origin, curr_sec_outer2)
+            curr_sec_outer2 = self._rotate_point(curr_sec_outer1, curr_sec_origin, 60)
             width = 3
             # For each line in the current triangle, determine if it should be drawn
-            if self.lines[tri][0] == "1":   # Draw line 1
+            if self.lines[tri][0] == "1":  # Draw line 1
                 Hexagram.canvas.create_line(primary_origin + curr_primary, fill="orange", width=width)
-            if self.lines[tri][1] == "1":   # Draw line 2
+            if self.lines[tri][1] == "1":  # Draw line 2
                 Hexagram.canvas.create_line(curr_sec_origin + curr_sec_outer1, fill="orange", width=width)
-            if self.lines[tri][2] == "1":   # Draw line 3
+            if self.lines[tri][2] == "1":  # Draw line 3
                 Hexagram.canvas.create_line(curr_primary + next_primary, fill="green", width=width)
-            if self.lines[tri][3] == "1":   # Draw line 4
+            if self.lines[tri][3] == "1":  # Draw line 4
                 Hexagram.canvas.create_line(curr_sec_outer1 + curr_sec_outer2, fill="green", width=width)

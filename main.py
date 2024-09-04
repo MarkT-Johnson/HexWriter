@@ -1,8 +1,18 @@
-from hexClass import *
-from tkinter import *
+from hexClass import Hexagram
+import tkinter as tk
+
+"""
+HexWriter by "Drakken_Dude" / Mark Johnson | GitHub: 
+Distributed under Creative Commons CC BY-NC-SA 4.0 License
+https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+Feel free to adapt/build on this as you wish!
+"""
+
 
 class EncodingError(Exception):
     pass
+
 
 def encoder(text: str) -> list[list[str]]:
     """
@@ -116,7 +126,7 @@ def encoder(text: str) -> list[list[str]]:
                 left_letter = not left_letter
                 continue
             elif character in "1234567890.":
-                # If the character is a number or period then we dont need to add a left right indicator or
+                # If the character is a number or period then we don't need to add a left right indicator or
                 # alternate the tracker
                 letter = character
             elif character.isalpha():
@@ -127,11 +137,12 @@ def encoder(text: str) -> list[list[str]]:
             else:
                 # This must be a special character and is not encoded, stop processing and fail gracefully
                 position = text.find(character) + 1
-                raise EncodingError(f"Unknown character encountered: \"{character}\" at position {str(position)} in input")
+                raise EncodingError(f"Unknown character encountered: \"{character}\" at position {str(position)} in "
+                                    f"input")
 
             # Get the encoding for each letter, then append the encoding to the new_hex
             encoding = alphabet.get(letter)
-            for triangle in range(0,6):
+            for triangle in range(0, 6):
                 new_hex[triangle] = new_hex[triangle] + encoding[triangle]
 
         # add the new hex to the existing ones
@@ -150,7 +161,7 @@ def on_enter_key(event):
 
 def draw_hexagram():
     # Encodes the user's message and draws the new hexagram
-    message = "This is a default messsage, if you are seeing this then something has gone wrong. Sorry! ¯\_(ツ)_/¯"
+    message = "This is a default message, if you are seeing this then something has gone wrong. Sorry! ¯\\_(ツ)_/¯"
     try:
         # Clear the canvas before updating
         canvas.delete("all")
@@ -162,18 +173,19 @@ def draw_hexagram():
         # Draw the hexagram on the canvas
         hex_num = 1
         if len(encoded_text) <= 7:
-            for hex in encoded_text:
-                Hexagram(hex, hex_num, canvas_size, canvas)
+            for hexagon in encoded_text:
+                Hexagram(hexagon, hex_num, canvas_size, canvas)
                 hex_num += 1
             message = str(encoded_text)
         else:
-            length_err = "Message too long. Limited to 28 letters, numbers, and periods total. Spaces are not counted in this total."
+            length_err = "Message too long. Limited to 28 letters, numbers, and periods total. Spaces are not " \
+                         "counted in this total."
             print(length_err)
             message = length_err
 
     except EncodingError as e:
-        message = f"There was an encoding error, please only use english letters ([a-Z]), numbers ([0-9]), periods (.), " \
-                  f"or spaces ( ).\n{e}"
+        message = f"There was an encoding error, please only use english letters ([a-Z]), numbers ([0-9]), periods " \
+                  f"(.), or spaces ( ).\n{e}"
 
     finally:
         text_output['state'] = "normal"
@@ -181,17 +193,14 @@ def draw_hexagram():
         text_output.insert(tk.END, message)
         text_output['state'] = "disabled"
 
+
 ################ Start of script ################
 # Create the parent frame
-window = Tk()
+window = tk.Tk()
 
 window.title("HexWriter")
 window.geometry("1000x1050")
 window.resizable(False, False)
-
-# Create an encoding frame
-# encoder_frame = Frame(window)
-# encoder_frame.pack(padx=10, pady=10, fill='x', expand=True)
 
 # Create a text box for user to enter text
 entry = tk.Entry(window, width=50)
@@ -211,7 +220,7 @@ text_output['state'] = "disabled"
 
 # Create a canvas for drawing on
 canvas_size = 1000
-canvas = Canvas(window, width=canvas_size, height=canvas_size, bg="white")
+canvas = tk.Canvas(window, width=canvas_size, height=canvas_size, bg="white")
 
 canvas.pack()
 
