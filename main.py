@@ -75,8 +75,8 @@ def encoder(text: str) -> list[list[str]]:
                 "_Z": ["0", "1", "1", "1", "1", "1"],
                 ".": ["0", "0", "0", "0", "0", "0"]}
 
-    # Convert the text to all upper case. We need to split it into chunks of 4 while replacing spaces with an indicator
-    # that a space needs to be placed here instead. chunk_count is used to keep track if we need to start a new chunk
+    # Convert the text to all upper case. We need to split it into chunks of 4 while ignoring spaces.
+    # chunk_count is used to keep track if we need to start a new chunk.
     text = text.upper()
     four_chunks = []
     new_chunk = ""
@@ -126,8 +126,8 @@ def encoder(text: str) -> list[list[str]]:
                 left_letter = not left_letter
             else:
                 # This must be a special character and is not encoded, stop processing and fail gracefully
-                position = text.find(character)
-                raise EncodingError(f"Unknown character encountered: {character} at position {str(position)} in input")
+                position = text.find(character) + 1
+                raise EncodingError(f"Unknown character encountered: \"{character}\" at position {str(position)} in input")
 
             # Get the encoding for each letter, then append the encoding to the new_hex
             encoding = alphabet.get(letter)
@@ -139,13 +139,18 @@ def encoder(text: str) -> list[list[str]]:
 
     return hexes
 
+
 # Function to handle the Enter key press when user is finished typing
 def on_enter_key(event):
     # Used because the binding of entry to the return key requires a function that can take in an event.
     # But since we don't need the event really, we can simply point it to a function that discards it on calling the
     # draw_hexagram function.
     draw_hexagram()
+
+
 def draw_hexagram():
+    # Encodes the user's message and draws the new hexagram
+    message = "This is a default messsage, if you are seeing this then something has gone wrong. Sorry! ¯\_(ツ)_/¯"
     try:
         # Clear the canvas before updating
         canvas.delete("all")
@@ -167,7 +172,8 @@ def draw_hexagram():
             message = length_err
 
     except EncodingError as e:
-        message = "There was an encoding error, please only use english letters ([a-Z]), numbers ([0-9]), periods (.), or spaces ( )."
+        message = f"There was an encoding error, please only use english letters ([a-Z]), numbers ([0-9]), periods (.), " \
+                  f"or spaces ( ).\n{e}"
 
     finally:
         text_output['state'] = "normal"
@@ -202,8 +208,6 @@ text_output.insert(tk.END, "Your message will also appear as a numerical encoded
                            "drawing again or decoding in the future.")
 text_output.pack(pady=10)
 text_output['state'] = "disabled"
-
-
 
 # Create a canvas for drawing on
 canvas_size = 1000
