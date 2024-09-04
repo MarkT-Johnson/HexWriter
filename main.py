@@ -2,7 +2,7 @@ from hexClass import Hexagram
 import tkinter as tk
 
 """
-HexWriter by "Drakken_Dude" / Mark Johnson | GitHub: 
+HexWriter by "Drakken_Dude" / Mark Johnson | GitHub: https://github.com/MarkT-Johnson/HexWriter
 Distributed under Creative Commons CC BY-NC-SA 4.0 License
 https://creativecommons.org/licenses/by-nc-sa/4.0/
 
