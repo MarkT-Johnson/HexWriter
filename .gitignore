@@ -2,4 +2,4 @@
 /.idea/
 /build/
 /HexWriter.spec
-/dist/HexWriter/_internal/
+/dist/HexWriter/
