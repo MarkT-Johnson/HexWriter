@@ -3,7 +3,7 @@ from math import cos, sin, pi
 
 """
 HexWriter by "Drakken_Dude" / Mark Johnson | GitHub: https://github.com/MarkT-Johnson/HexWriter
-Distributed under Creative Commons CC BY-NC-SA 4.0 License
+Distributed under Creative Commons License CC BY-NC-SA 4.0
 https://creativecommons.org/licenses/by-nc-sa/4.0/
 
 Feel free to adapt/build on this as you wish!
