@@ -37,12 +37,19 @@ def decoder(lines: list[list[str]]) -> str:
                 character_enc = ""
                 for triangle in hex:
                     if len(triangle) == 4:
-                        # Build the character from each triangle
-                        character_enc = character_enc + triangle[loop]
+                        if triangle[loop] in ("1", "0"):
+                            # Build the character from each triangle
+                            character_enc = character_enc + triangle[loop]
+                        else:
+                            # This triangle contains characters other than 0 or 1
+                            # [['0112', '1000', '1010', '1111', '1011', '0101']]
+                            raise EncodingError(f"Character {triangle[loop]} in triangle {str(triangle)} in hex "
+                                                f"{str(hex)} is not a 1 or 0. This is a malformed hex encoding.")
                     else:
                         # This triangle does not contain 4 lines, raise an encoding/decoding error
+                        # [['01111', '1000', '1010', '1111', '1011', '0101']]
                         raise EncodingError(f"Triangle {str(triangle)} in hex {str(hex)} does not represent 4 lines. "
-                                            f"This is a malformed hex encoding")
+                                            f"This is a malformed hex encoding.")
                 # Decode the letter and append to the message
                 character_dec = alphabet_dec.get(character_enc)
                 # If the decoded character is a period, append another period to make cleanup easier
@@ -176,8 +183,14 @@ def draw_hexagram():
         text = entry.get()
         if text[0] == "[":
             # The user is likely using the decoding function, we need to convert the text to a list[list[str]]
-            encoded_text = ast.literal_eval(text)
-            message = decoder(encoded_text)
+            try:
+                encoded_text = ast.literal_eval(text)
+                message = decoder(encoded_text)
+            except SyntaxError as e:
+                raise SyntaxError(f"Decoding failed, your numerically encoded message could not be understood:\n{e}")
+            except TypeError as e:
+                raise TypeError(f"Your encoded message does not contain strings. Please follow the format below as an "
+                                f"example:\n[['0110', '1000', '1010', '1111', '1011', '0101']]")
         else:
             # This is likely new text, encode it as normal
             encoded_text = encoder(text)
@@ -196,8 +209,9 @@ def draw_hexagram():
             print(length_err)
             message = length_err
 
-    except EncodingError as e:
+    except (EncodingError, SyntaxError, TypeError) as e:
         message = f"There was an encoding/decoding error:\n{e}"
+
 
     finally:
         text_output['state'] = "normal"
