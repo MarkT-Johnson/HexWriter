@@ -22,25 +22,67 @@ def decoder(lines: list[list[str]]) -> str:
     :param lines: The numerical encoding.
     :return: The text that could have generated this numerical encoding.
     """
+    dirty_message = ""
     message = ""
 
     # Start by breaking the list of hexes into individual hexes
     # [['1111', '1000', '1101', '0001', '1010', '0101'], [...,...,...,...,...,...],...]
     for hex in lines:
-        # ['1111', '1000', '1101', '0001', '1010', '0101']
-        # Now we need to combine the characters in the same positions into the same list
-        for loop in range(4):
-            # loop determines where in each triangle we are pulling the parts of the letter from
-            character_enc = ""
-            for triangle in hex:
-                # Build the character from each triangle
-                character_enc = character_enc + triangle[loop]
-            # Decode the letter and append to the message
-            message = message + alphabet_dec.get(character_enc)
+        # Check the hex has the right number of triangles
+        if len(hex) == 6:
+            # ['1111', '1000', '1101', '0001', '1010', '0101']
+            # Now we need to combine the characters in the same positions into the same list
+            for loop in range(4):
+                # loop determines where in each triangle we are pulling the parts of the letter from
+                character_enc = ""
+                for triangle in hex:
+                    if len(triangle) == 4:
+                        # Build the character from each triangle
+                        character_enc = character_enc + triangle[loop]
+                    else:
+                        # This triangle does not contain 4 lines, raise an encoding/decoding error
+                        raise EncodingError(f"Triangle {str(triangle)} in hex {str(hex)} does not represent 4 lines. "
+                                            f"This is a malformed hex encoding")
+                # Decode the letter and append to the message
+                character_dec = alphabet_dec.get(character_enc)
+                # If the decoded character is a period, append another period to make cleanup easier
+                character_dec = character_dec if character_dec != "." else character_dec + "."
+
+                dirty_message = dirty_message + character_dec
+        else:
+            # Hex does not have all triangles or has too many. Raise an error
+            raise EncodingError(f" Hex {str(hex)} does not represent 6 triangles. This is a malformed hex encoding")
 
     # Now that we have the decoded message, we need to clean up the message by removing underscores and adding spaces
+    # We assume we are starting with left preference as is used for encoding.
+    left_letter = True
+    index = 0
+    end = index + 2
+    while end <= len(dirty_message):
+        # Get the first/next two characters to figure out if its left or right tracked
+        character = dirty_message[index:end]
 
-    return message
+        if (character[0] == "_" and left_letter) or (character[0].isalpha() and not left_letter):
+            # We have a break in the pattern, insert a space with the character
+            character = " " + character.strip("_")
+            # Do not alternate the left_letter tracker as we now expect the same preference
+        elif character[0] == ".":
+            # We have double periods. Keep one and do not alternate tracker
+            character = "."
+        elif (character[0].isalpha() and left_letter) or (character[0] == "_" and not left_letter):
+            # The pattern agrees, alternate the tracker and strip _
+            character = character.strip("_")
+            left_letter = not left_letter
+        else:
+            # This should theoretically not occur but placing a catchall just in case
+            raise EncodingError("There was an issue while decoding your message. Cleanup of decoded message failed")
+
+        # Move the range down and append the character to the message
+        index = end
+        end = index + 2
+        message = message + character
+
+    return message.strip(".")
 
 
 def encoder(text: str) -> list[list[str]]:
@@ -103,7 +145,7 @@ def encoder(text: str) -> list[list[str]]:
                 # This must be a special character and is not encoded, stop processing and fail gracefully
                 position = text.find(character) + 1
                 raise EncodingError(f"Unknown character encountered: \"{character}\" at position {str(position)} in "
-                                    f"input")
+                                    f"input. Please only use english alphabet, periods, numbers, or spaces")
 
             # Get the encoding for each letter, then append the encoding to the new_hex
             encoding = alphabet_enc.get(letter)
@@ -155,8 +197,7 @@ def draw_hexagram():
             message = length_err
 
     except EncodingError as e:
-        message = f"There was an encoding error, please only use english letters ([a-Z]), numbers ([0-9]), periods " \
-                  f"(.), or spaces ( ).\n{e}"
+        message = f"There was an encoding/decoding error:\n{e}"
 
     finally:
         text_output['state'] = "normal"
